@@ -58,17 +58,21 @@ flowchart TD
     B2 --> G([HTTP Response JSON])
 ```
 
+<br/>
 
-**Controllers**
-Recebem e validam as requisições HTTP, delegando a lógica ao Service 
+- **Controllers** recebem e validam as requisições HTTP, delegando a lógica ao Service 
 
-**Services** concentram todas as regras de negócio e orquestram as operações
+- **Services** concentram todas as regras de negócio e orquestram as operações
 
-**Respositories** (JPA) Encapsulam o acesso ao banco de dados, incluindo queries customizadas com JPQL.
+- **Respositories** (JPA) Encapsulam o acesso ao banco de dados, incluindo queries customizadas com JPQL.
 
-**Domain Entities** Carregam invariantes de domínio via factory methods e assertions internas
+- **Domain Entities** Carregam invariantes de domínio via factory methods e assertions internas
 
-**GlobalExcaptionHandler** (@RestControllerAdvice) captura e forma todos os erros em um padrão único (ApiError)
+- **GlobalExcaptionHandler** (@RestControllerAdvice) captura e forma todos os erros em um padrão único (ApiError)
+
+
+<br/>
+
 
 **🔗 Endpoints**
 
@@ -82,6 +86,8 @@ Recebem e validam as requisições HTTP, delegando a lógica ao Service
 | **PUT** | `/api/v1/rooms/{id}` | Atualiza os dados de uma sala. |
 | **DELETE** | `/api/v1/rooms/{id}` | Desativa a sala (**soft delete**). |
 
+<br/>
+
 **Usuários — /api/v1/users**
 
 | Método | Rota | Descrição |
@@ -91,6 +97,8 @@ Recebem e validam as requisições HTTP, delegando a lógica ao Service
 | **POST** | `/api/v1/users` | Cria um novo usuário. |
 | **PUT** | `/api/v1/users/{id}` | Atualiza os dados de um usuário. |
 | **DELETE** | `/api/v1/users/{id}` | Remove o usuário. |
+
+<br/>
 
 **Reservas — /api/v1/bookings**
 
@@ -105,29 +113,36 @@ Recebem e validam as requisições HTTP, delegando a lógica ao Service
 | **PUT** | `/api/v1/bookings/{id}` | Reagenda uma reserva existente. |
 | **DELETE** | `/api/v1/bookings/{id}` | Cancela uma reserva (status → **`CANCELLED`**). |
 
+<br/>
+
 **Exemplo de corpo para criar uma reserva**
 
+````
 {
   "roomId": 1,
   "userId": 2,
   "startTime": "2026-07-10T09:00:00",
   "endTime": "2026-07-10T10:30:00"
 }
+````
+
+<br/>
 
 **Padrão de erro retornado**
 
+````
 {
   "status": 409,
   "error": "Booking Conflict",
   "message": "Room already has an active booking from 2026-07-10T09:00 to 2026-07-10T10:30 (booking id: 5).",
   "timestamp": "2026-07-10T08:45:00"
 }
+````
 
+<br/>
 
 
 **📁 Estrutura do Projeto**
-
-## Estrutura do Projeto
 
 ```text
 src/
@@ -168,23 +183,27 @@ src/
             └── UserServiceTest.java
 ```
 
+<br/>
+
 **📐 Regras de Negócio**
 
-Uma sala só aceita reservas se estiver com status active = true
+- Uma sala só aceita reservas se estiver com status active = true
 
-Dois intervalos [a, b) e [c, d) conflitam quando a < d AND c < b — bookings adjacentes não conflitam
+- Dois intervalos [a, b) e [c, d) conflitam quando a < d AND c < b — bookings adjacentes não conflitam
 
-O status CANCELLED exclui a reserva de qualquer verificação de conflito futura
+- O status CANCELLED exclui a reserva de qualquer verificação de conflito futura
 
-Ao reagendar, a própria reserva é excluída da checagem para não conflitar com seu horário anterior
+- Ao reagendar, a própria reserva é excluída da checagem para não conflitar com seu horário anterior
 
-O lock pessimista (PESSIMISTIC_WRITE) na query de conflito garante atomicidade em cenários de alta concorrência
+- O lock pessimista (PESSIMISTIC_WRITE) na query de conflito garante atomicidade em cenários de alta concorrência
 
-E-mails de usuários são sempre normalizados para lowercase e sem espaços antes de serem persistidos
+- E-mails de usuários são sempre normalizados para lowercase e sem espaços antes de serem persistidos
 
-Nomes de salas são únicos (case-sensitive após trim)
+- Nomes de salas são únicos (case-sensitive após trim)
 
-endTime deve ser estritamente posterior ao startTime
+- endTime deve ser estritamente posterior ao startTime
+
+<br/>
 
 **🧪 Testes Unitários**
 
@@ -201,10 +220,14 @@ Os testes cobrem as camadas de domínio e serviço, utilizando JUnit 5, Mockito 
 | **UserTest** | Normalização de nome e e-mail na criação; conversão para lowercase; trim; atualização com normalização. |
 | **UserServiceTest** | Criação com e-mail único; normalização do e-mail antes da checagem; e-mail duplicado; atualização com e-mail disponível; e-mail de outro usuário; usuário não encontrado; delete; `findById`. |
 
+<br/>
+
 **Executar os testes**
 
 bash
 mvn test
+
+<br/>
 
 
 **📄 Documentação Swagger**
@@ -215,27 +238,31 @@ http://localhost:8080/swagger-ui.html
 
 Pelo Swagger UI é possível visualizar todos os endpoints, seus parâmetros, schemas de request/response e testar as chamadas diretamente no navegador.
 
+<br/>
+
 🐳 Como executar com Docker
 
 A aplicação é totalmente containerizada com Docker Compose, que sobe dois serviços:
-
 
 mysql — MySQL 8.4 com volume persistente e healthcheck
 
 api — A aplicação Spring Boot, que aguarda o MySQL estar saudável antes de iniciar (depends_on: condition: service_healthy)
 
-Pré-requisitos
+<br/>
 
+Pré-requisitos:
 
 Docker e Docker Compose instalados
 
 Passo a passo
 
+<br/>
+
 **1. Clone o repositório**
 
 git clone https://github.com/seu-usuario/room-booking.git
 
-cd room-booking
+<br/>
 
 **2. Configure as variáveis de ambiente**
 
@@ -250,6 +277,7 @@ DB_PASSWORD=troqueEstaSenha123
 
 ⚠️ Importante: Altere as senhas antes de usar em qualquer ambiente que não seja local.
 
+<br/>
 
 **3. Suba os containers**
 
@@ -259,20 +287,29 @@ docker compose up --build
 
 A aplicação estará disponível em http://localhost:8080 assim que o MySQL passar no healthcheck e as migrations do Flyway forem aplicadas.
 
+<br/>
+
 **4. Parar os containers**
 
 bash
 
 docker compose down
 
+<br/>
 
 **5.Para também remover o volume do banco de dados:**
+
+docker compose down -v
+
+<br/>
 
 **Como a imagem Docker é construída**
 
 bash
 
 docker compose down -v
+
+<br/>
 
 
 **O Dockerfile** utiliza **multi-stage build** para manter a imagem final leve:
@@ -284,6 +321,7 @@ docker compose down -v
 
 Isso garante que ferramentas de build (Maven, JDK completo) não entrem na imagem de produção, reduzindo significativamente seu tamanho.
 
+<br/>
 
 **Variáveis de Ambiente** 
 
@@ -295,16 +333,14 @@ Isso garante que ferramentas de build (Maven, JDK completo) não entrem na image
 | `DB_USERNAME` | Usuário do banco de dados. | `root` |
 | `DB_PASSWORD` | Senha do banco de dados. | `troqueEstaSenha123` |
 
-
-
-
-
+<br/>
+<br/>
 
 # Agradecimentos / Referências: 
 
 <br/> 
 
-DevSuperior - Escola de programação 
+Alura 
 
 ----------
 
