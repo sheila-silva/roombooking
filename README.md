@@ -8,14 +8,11 @@
 
 Room Booking é uma API REST para revervas de salas, com containerização usando Docker desenvolvida com Spring Boot. Ela permite cadastrar salas e usuários, realizar reservas com validação de conflito de horários, reagendar e cancelar reservas, tudo com paginação e tratamento de erros centralizados. 
 
-
 <br/>
 
 **Sobre a API**
 
-O Room Booking API é um sistema de reserva de salas que oferece controle completo sobre três entidades principais: 
-
-**Entidades**
+Esse sistema de reserva de salas oferece controle completo sobre três entidades principais: 
 
 | Entidade | Descrição |
 |-----------|-----------|
@@ -23,8 +20,10 @@ O Room Booking API é um sistema de reserva de salas que oferece controle comple
 | **User (Usuário)** | Usuários que realizam reservas. **E-mail único**, normalizado para **lowercase**. |
 | **Booking (Reserva)** | Vínculo entre sala e usuário com período de tempo. Possui status **`ACTIVE`** ou **`CANCELLED`**. Nunca é deletada fisicamente. |
 
+<br/>
 
 **🛠️ Tecnologias**
+
 
 | Camada | Tecnologia |
 |---------|------------|
@@ -40,35 +39,26 @@ O Room Booking API é um sistema de reserva de salas que oferece controle comple
 | **Containerização** | Docker + Docker Compose |
 | **Build** | Maven |
 
+<br/>
 
-
-**Arquitetura**
+**⚙️ Arquitetura**
 
 O projeto segue uma arquitetura em camadas clássica do Spring Boot, com separação clara de responsabilidades. 
 
-
-```text
-                Controller
-                     │
-        ┌────────────┴────────────┐
-        │                         │
-      DTOs                    Service
-(Request/Response)              │
-                                ▼
-                        Domain Entities
-                  (Room, User, Booking)
-                                │
-                                ▼
-                           Repository
-                                │
-                                ▼
-                              MySQL
+```mermaid
+flowchart TD
+    A([HTTP Request JSON]) --> B[Controller\nvalida @Valid]
+    B --> C[Service\nregras de negócio]
+    C --> D[Domain Entity\nBooking.create]
+    D --> E[Repository\npersiste]
+    E --> F[(MySQL)]
+    F --> E2[Repository\nretorna Entity]
+    E2 --> C2[Service\nBookingResponse.from]
+    C2 --> B2[Controller\nserializa JSON]
+    B2 --> G([HTTP Response JSON])
 ```
 
 
-```text
-
-````
 **Controllers**
 Recebem e validam as requisições HTTP, delegando a lógica ao Service 
 
@@ -137,6 +127,9 @@ Recebem e validam as requisições HTTP, delegando a lógica ao Service
 
 **📁 Estrutura do Projeto**
 
+## Estrutura do Projeto
+
+```text
 src/
 ├── main/
 │   ├── java/com/roombooking/
@@ -149,17 +142,31 @@ src/
 │   │   ├── dto/
 │   │   │   ├── request/         # BookingRequest, RoomRequest, UserRequest
 │   │   │   └── response/        # BookingResponse, RoomResponse, UserResponse
-│   │   └── exception/           # BusinessException, ConflictException, ResourceNotFoundException
-│   │       └── handler/         # GlobalExceptionHandler, ApiError
+│   │   └── exception/
+│   │       ├── BusinessException.java
+│   │       ├── ConflictException.java
+│   │       ├── ResourceNotFoundException.java
+│   │       └── handler/
+│   │           ├── GlobalExceptionHandler.java
+│   │           └── ApiError.java
 │   └── resources/
-│       ├── db/migration/        # V1__create_initial_schema.sql, V2__seed_data.sql
+│       ├── db/
+│       │   └── migration/
+│       │       ├── V1__create_initial_schema.sql
+│       │       └── V2__seed_data.sql
 │       └── application.properties
 └── test/
     └── java/com/roombooking/
-        ├── domain/entity/       # BookingTest, RoomTest, UserTest
-        └── service/             # BookingServiceTest, RoomServiceTest, UserServiceTest
-
-        
+        ├── domain/
+        │   └── entity/
+        │       ├── BookingTest.java
+        │       ├── RoomTest.java
+        │       └── UserTest.java
+        └── service/
+            ├── BookingServiceTest.java
+            ├── RoomServiceTest.java
+            └── UserServiceTest.java
+```
 
 **📐 Regras de Negócio**
 
