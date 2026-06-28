@@ -229,7 +229,6 @@ mvn test
 
 <br/>
 
-
 **📄 Documentação Swagger**
 
 A documentação interativa da API é gerada automaticamente pelo SpringDoc OpenAPI e está disponível após subir a aplicação:
@@ -297,7 +296,7 @@ docker compose down
 
 <br/>
 
-**5.Para também remover o volume do banco de dados:**
+**5. Para também remover o volume do banco de dados:**
 
 docker compose down -v
 
@@ -310,7 +309,6 @@ bash
 docker compose down -v
 
 <br/>
-
 
 **O Dockerfile** utiliza **multi-stage build** para manter a imagem final leve:
 
@@ -342,7 +340,7 @@ Isso garante que ferramentas de build (Maven, JDK completo) não entrem na image
 
 Alura 
 
-----------
+-----
 
 # Autora:
 
