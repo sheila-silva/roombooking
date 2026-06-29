@@ -1,4 +1,4 @@
-## 🎬 Room Booking
+## Room Booking
 
 <br/> 
 
